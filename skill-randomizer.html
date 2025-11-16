@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VtM Random Skill Assigner</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #1b1b1b;
+      border-radius: 12px;
+      padding: 20px 24px 24px;
+      max-width: 540px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+      letter-spacing: 0.03em;
+      text-align: center;
+    }
+    .subtitle {
+      margin: 0 0 16px;
+      font-size: 0.85rem;
+      text-align: center;
+      color: #aaa;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+    }
+    .controls input[type="number"] {
+      padding: 4px 6px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #101010;
+      color: #eee;
+      width: 80px;
+    }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #ccc;
+    }
+    #rollButton {
+      width: 100%;
+      margin-top: 6px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, #c2185b, #6a1b9a);
+      color: #fff;
+      transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
+    }
+    #rollButton:hover {
+      filter: brightness(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+    #rollButton:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    .summary {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #bbb;
+    }
+.skills {
+  margin-top: 16px;
+  border-top: 1px solid #333;
+  padding-top: 14px;
+}
+    .skill-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3px 0;
+      font-size: 0.9rem;
+    }
+    .skill-name {
+      color: #eee;
+    }
+    .dots {
+      font-family: "Menlo", "Consolas", monospace;
+      color: #ffeb3b;
+      letter-spacing: 1px;
+    }
+    .error {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: #ff8a80;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>VtM Skill Randomizer</h1>
+    <p class="subtitle">
+      Randomly assign XP to the 27 Skills using a flat 3&nbsp;XP-per-dot scale (120 XP → 40 points).
+    </p>
+
+    <div class="controls">
+      <label>
+        Total points
+        <input id="pointsInput" type="number" min="1" value="40">
+      </label>
+      <label>
+        Max dots/Skill
+        <input id="maxDotsInput" type="number" min="1" value="5">
+      </label>
+    </div>
+
+    <button id="rollButton">Randomize Skills</button>
+    <div id="error" class="error"></div>
+
+    <div id="summary" class="summary"></div>
+    <div id="skillsContainer" class="skills"></div>
+  </div>
+
+  <script>
+    const SKILL_NAMES = [
+      "Athletics", "Animal Ken", "Academics", "Brawl", "Etiquette",
+      "Awareness", "Craft", "Insight", "Finance", "Drive",
+      "Intimidation", "Investigation", "Firearms", "Leadership", "Medicine",
+      "Larceny", "Performance", "Occult", "Melee", "Persuasion",
+      "Politics", "Stealth", "Streetwise", "Science", "Survival",
+      "Subterfuge", "Technology"
+    ];
+
+    function randomInt(max) {
+      return Math.floor(Math.random() * max); // 0..max-1
+    }
+
+    // Core logic: assign points according to cost = currentDots + 1
+    function randomizeSkills(totalPoints, maxDotsPerSkill) {
+      // Initialise skills
+      const skills = SKILL_NAMES.map(name => ({ name, dots: 0 }));
+      let pool = totalPoints;
+      let safetyCounter = 0; // prevent infinite loops if something goes weird
+
+      while (pool > 0 && safetyCounter < 10000) {
+        safetyCounter++;
+
+        // Build list of skills we can afford to increase
+        const affordableIndexes = [];
+        for (let i = 0; i < skills.length; i++) {
+          const current = skills[i].dots;
+          if (current >= maxDotsPerSkill) continue;
+          const cost = current + 1;
+          if (cost <= pool) {
+            affordableIndexes.push(i);
+          }
+        }
+
+        // If we can't afford any skill, break (pool may be > 0 but unusable)
+        if (affordableIndexes.length === 0) break;
+
+        // Pick a random affordable skill
+        const chosenIndex = affordableIndexes[randomInt(affordableIndexes.length)];
+        const chosenSkill = skills[chosenIndex];
+
+        const cost = chosenSkill.dots + 1;
+        chosenSkill.dots += 1;
+        pool -= cost;
+      }
+
+      return { skills, remainingPool: pool };
+    }
+
+    function renderResult(result, totalPoints) {
+      const summaryEl = document.getElementById("summary");
+      const skillsContainer = document.getElementById("skillsContainer");
+
+      const { skills, remainingPool } = result;
+
+      const spent = totalPoints - remainingPool;
+      summaryEl.innerHTML =
+        `Spent <strong>${spent}</strong> points out of <strong>${totalPoints}</strong>.` +
+        (remainingPool > 0
+          ? ` <span style="color:#ffeb3b;">(${remainingPool} point${remainingPool === 1 ? "" : "s"} could not be spent with the current random distribution.)</span>`
+          : "");
+
+      const nonZero = skills.filter(s => s.dots > 0);
+
+      if (nonZero.length === 0) {
+        skillsContainer.innerHTML = "<p>No skills received any dots. Try again.</p>";
+        return;
+      }
+
+      const rowsHtml = nonZero
+        .map(skill => {
+          const dots = "●".repeat(skill.dots);
+          return `<div class="skill-row">
+                    <span class="skill-name">${skill.name}</span>
+                    <span class="dots">${dots}</span>
+                  </div>`;
+        })
+        .join("");
+
+      skillsContainer.innerHTML = rowsHtml;
+    }
+
+    document.getElementById("rollButton").addEventListener("click", () => {
+      const errorEl = document.getElementById("error");
+      errorEl.textContent = "";
+
+      const pointsInput = document.getElementById("pointsInput");
+      const maxDotsInput = document.getElementById("maxDotsInput");
+
+      const totalPoints = parseInt(pointsInput.value, 10);
+      const maxDotsPerSkill = parseInt(maxDotsInput.value, 10);
+
+      if (!Number.isFinite(totalPoints) || totalPoints <= 0) {
+        errorEl.textContent = "Total points must be a positive number.";
+        return;
+      }
+      if (!Number.isFinite(maxDotsPerSkill) || maxDotsPerSkill <= 0) {
+        errorEl.textContent = "Max dots per Skill must be at least 1.";
+        return;
+      }
+
+      const result = randomizeSkills(totalPoints, maxDotsPerSkill);
+      renderResult(result, totalPoints);
+    });
+
+    // Initial example roll
+    (function initial() {
+      const result = randomizeSkills(40, 5);
+      renderResult(result, 40);
+    })();
+  </script>
+</body>
+</html>

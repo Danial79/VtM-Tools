@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Blood Resonance Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #111;
+            color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #1b1b1b;
+            border-radius: 12px;
+            padding: 20px 24px 24px;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        h1 {
+            margin: 0 0 4px;
+            font-size: 1.4rem;
+            letter-spacing: 0.03em;
+            text-align: center;
+        }
+
+        .subtitle {
+            margin: 0 0 16px;
+            font-size: 0.85rem;
+            text-align: center;
+            color: #aaa;
+        }
+
+        #generateButton {
+            width: 100%;
+            margin-top: 4px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            background: linear-gradient(135deg, #c2185b, #6a1b9a);
+            color: #fff;
+            transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
+        }
+
+        #generateButton:hover {
+            filter: brightness(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+        }
+
+        #generateButton:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-card {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background:
+                radial-gradient(circle at top left, rgba(194, 24, 91, 0.18), transparent 55%),
+                #141414;
+            border: 1px solid #333;
+            min-height: 90px;
+        }
+
+        .placeholder {
+            font-size: 0.85rem;
+            color: #777;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .result-main {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-align: center;
+            color: #ffeb3b;
+            text-shadow: 0 0 6px rgba(255, 235, 59, 0.5);
+        }
+
+        .result-main span.resonance-tag {
+            color: #ffca28;
+        }
+
+        .resonance-line,
+        .disc-line,
+        .effect-lines,
+        .effect-note,
+        .dyscrasia-line,
+        .dyscrasia-note {
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .resonance-line strong,
+        .disc-line strong {
+            color: #fff;
+        }
+
+        .effect-lines {
+            margin-top: 8px;
+            color: #ddd;
+        }
+
+        .effect-note {
+            margin-top: 8px;
+            color: #b0bec5;
+            font-style: italic;
+        }
+
+        .dyscrasia-line {
+            margin-top: 10px;
+            padding-top: 6px;
+            border-top: 1px solid #333;
+            color: #ffab91;
+        }
+
+        .dyscrasia-line strong {
+            color: #ffeb3b;
+            text-shadow: 0 0 3px rgba(255, 235, 59, 0.5);
+        }
+
+        .dyscrasia-note {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 4px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #333;
+            margin: 8px 0 10px;
+        }
+
+        .effect-list {
+            margin: 8px 0 0 16px;
+            padding: 0;
+            color: #ddd;
+            font-size: 0.85rem;
+        }
+
+        .effect-list li {
+            margin-bottom: 8px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Blood Resonance Generator</h1>
+        <p class="subtitle">
+            Generate V5 blood temperament, resonance, and a possible dyscrasia.
+        </p>
+
+        <button id="generateButton">Generate Blood Resonance</button>
+
+        <div id="resultCard" class="result-card">
+            <div class="placeholder">Click “Generate Blood Resonance” to begin.</div>
+        </div>
+    </div>
+
+    <script>
+        function randomInt(max) {
+            // 0..max-1
+            return Math.floor(Math.random() * max);
+        }
+
+        const RESONANCE_DATA = {
+            Phlegmatic: {
+                disciplines: "Auspex, Dominate",
+                dyscrasias: [
+                    "Chill",
+                    "Comfortably Numb",
+                    "Eating Your Emotions",
+                    "Given Up",
+                    "Lone Wolf",
+                    "Procrastinate",
+                    "Reflection"
+                ]
+            },
+            Melancholic: {
+                disciplines: "Fortitude, Obfuscate",
+                dyscrasias: [
+                    "In Mourning",
+                    "Lost Love",
+                    "Lost Relative",
+                    "Massive Failure",
+                    "Nostalgic",
+                    "Recalling"
+                ]
+            },
+            Choleric: {
+                disciplines: "Celerity, Potence",
+                dyscrasias: [
+                    "Bully",
+                    "Cycle of Violence",
+                    "Envy",
+                    "Principled",
+                    "Vengeful",
+                    "Vicious",
+                    "Driving"
+                ]
+            },
+            Sanguine: {
+                disciplines: "Blood Sorcery, Presence",
+                dyscrasias: [
+                    "Contagious Enthusiasm",
+                    "Smell Game",
+                    "High on Life",
+                    "Manic High",
+                    "True Love",
+                    "Stirring"
+                ]
+            }
+        };
+
+        function rollTemperament() {
+            const roll = randomInt(10) + 1; // 1–10
+            if (roll >= 1 && roll <= 5) return "well-balanced";
+            if (roll >= 6 && roll <= 8) return "fleeting";
+            return "intense-base"; // will be refined to intense/acute
+        }
+
+        function rollResonance() {
+            const roll = randomInt(10) + 1; // 1–10
+            if (roll >= 1 && roll <= 3) return "Phlegmatic";
+            if (roll >= 4 && roll <= 6) return "Melancholic";
+            if (roll >= 7 && roll <= 8) return "Choleric";
+            return "Sanguine"; // 9–10
+        }
+
+        function generateBloodResonance() {
+            // Step 1: temperament
+            const tempBase = rollTemperament();
+            let temperament = tempBase;
+            let isAcute = false;
+
+            if (tempBase === "intense-base") {
+                const second = randomInt(10) + 1; // 1–10
+                if (second >= 9) {
+                    temperament = "acute";
+                    isAcute = true;
+                } else {
+                    temperament = "intense";
+                }
+            }
+
+            // Step 2: resonance (only if not well-balanced)
+            let resonance = null;
+            if (temperament !== "well-balanced") {
+                resonance = rollResonance();
+            }
+
+            // Build display strings
+            let mainText = "";
+            let resDisplay = "";
+            let discText = "";
+            let effectHtml = "";
+            let dyscrasiaName = null;
+
+            if (temperament === "well-balanced") {
+                mainText = "Well-balanced (no resonance)";
+            } else {
+                const tempLabel =
+                    temperament === "fleeting" ? "Fleeting" :
+                        temperament === "intense" ? "Intense" :
+                            temperament === "acute" ? "Acute" :
+                                "Unknown";
+
+                if (temperament === "acute") {
+                    mainText = `${tempLabel} ${resonance} (dyscrasia)`;
+                } else {
+                    mainText = `${tempLabel} ${resonance}`;
+                }
+
+                const data = RESONANCE_DATA[resonance];
+                if (data) {
+                    resDisplay = resonance;
+                    discText = data.disciplines;
+
+                    if (temperament === "fleeting") {
+                        effectHtml =
+                            `Player can now spend XP on associated disciplines.<br>` +
+                            `Thin-bloods can add <strong>1 dot</strong> to <i>one</i> associated discipline.`;
+                    } else if (temperament === "intense" || temperament === "acute") {
+                        effectHtml =
+                            `Player can now spend XP on associated disciplines.<br>` +
+                            `Player gets a <strong>+1 bonus die</strong> to associated discipline rolls.<br>` +
+                            `Thin-bloods can add <strong>2 dots</strong> to <i>one</i> associated discipline.`;
+                    }
+
+                    if (temperament === "acute" && Array.isArray(data.dyscrasias) && data.dyscrasias.length > 0) {
+                        const idx = randomInt(data.dyscrasias.length);
+                        dyscrasiaName = data.dyscrasias[idx];
+                    }
+                }
+            }
+
+            return {
+                temperament,
+                resonance,
+                mainText,
+                resDisplay,
+                discText,
+                effectHtml,
+                dyscrasiaName
+            };
+        }
+
+        function renderResult(result) {
+            const card = document.getElementById("resultCard");
+            const {
+                temperament,
+                resonance,
+                mainText,
+                resDisplay,
+                discText,
+                effectHtml,
+                dyscrasiaName
+            } = result;
+
+            // Base structure
+            let html = `<div class="result-main">${mainText}</div>`;
+
+            if (temperament !== "well-balanced" && resonance && discText) {
+                html += `
+                <div class="resonance-line">
+                    <strong>Resonance:</strong> <span class="resonance-tag">${resDisplay}</span>
+                </div>
+
+                <div class="disc-line">
+                    <strong>Associated Disciplines:</strong> ${discText}
+                </div>
+
+                <hr class="divider">
+            `;
+
+
+                if (effectHtml) {
+                    html += `
+  <ul class="effect-list">
+    ${effectHtml
+      .split("<br>")
+      .map(line => `<li>${line}</li>`)
+      .join("")}
+  </ul>
+`;
+                }
+
+                html += `
+          <div class="effect-note">
+            (Effects last until next feeding or Hunger 5)
+          </div>
+        `;
+            } else if (temperament === "well-balanced") {
+                html += `
+          <div class="effect-note">
+            No resonance; no special mechanical effects beyond normal feeding.
+          </div>
+        `;
+            }
+
+            if (dyscrasiaName) {
+                html += `
+          <div class="dyscrasia-line">
+            Possible Dyscrasia: <strong>${dyscrasiaName}</strong>
+          </div>
+          <div class="dyscrasia-note">
+            (See p.230–231 of the rulebook for details)
+          </div>
+        `;
+            }
+
+            card.innerHTML = html;
+        }
+
+        document.getElementById("generateButton").addEventListener("click", () => {
+            const result = generateBloodResonance();
+            renderResult(result);
+        });
+    </script>
+</body>
+
+</html>

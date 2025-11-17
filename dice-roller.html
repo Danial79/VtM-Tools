@@ -113,6 +113,12 @@
       margin-bottom: 6px;
     }
 
+    .successCount {
+      font-size: 1.5rem;
+      color: #ffeb3b;
+      text-shadow: 0 0 6px rgba(255, 235, 59, 0.5);
+    }
+
     .result-tag {
       display: inline-block;
       padding: 2px 7px;
@@ -262,8 +268,8 @@
 
 <body>
   <div class="container">
-    <h1>VtM V5 Dice Roller</h1>
-    <p class="subtitle">Personal browser-based roller — no servers, just the Beast.</p>
+    <h1>V5 Dice Roller</h1>
+    <p class="subtitle">Personal browser-based dice-roller</p>
 
     <div class="field-row">
       <div class="field">
@@ -416,7 +422,7 @@
       const hasDifficulty = difficulty !== null;
 
       // Summary text
-      let text = `Rolled ${pool} dice (${pool - hunger} normal + ${hunger} Hunger) → <strong>${successes}</strong> successes`;
+      let text = `Rolled ${pool} dice (${pool - hunger} normal + ${hunger} Hunger) → <span class="successCount"><strong>${successes}</strong></span> successes`;
       if (difficulty !== null) {
         text += ` vs difficulty <strong>${difficulty}</strong>`;
       }

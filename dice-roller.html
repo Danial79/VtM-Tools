@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>VtM V5 Dice Roller</title>
   <style>
     * {
@@ -208,8 +210,37 @@
       font-size: 0.8rem;
       margin-top: 6px;
     }
+
+    @media (max-width: 600px) {
+      body {
+        align-items: flex-start;
+        /* top-align instead of vertical center */
+        padding: 12px;
+        /* breathing room from screen edges */
+      }
+
+      .container {
+        max-width: 100%;
+        /* use full screen width */
+        margin-top: 12px;
+        border-radius: 0.75rem;
+        /* optional: slightly softer corners */
+        box-shadow: none;
+        /* optional: less “heavy” on mobile */
+      }
+
+      h1 {
+        font-size: 1.2rem;
+        /* gently shrink big text */
+      }
+
+      .subtitle {
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>VtM V5 Dice Roller</h1>
@@ -247,7 +278,7 @@
       </div>
 
       <div class="hint">
-        6-10 = 1 success. Each pair of 10s adds +2 bonus successes (critical).  
+        6-10 = 1 success. Each pair of 10s adds +2 bonus successes (critical).
         Messy Critical = crit with at least one Hunger 10. Bestial Failure = failed roll with a Hunger 1.
       </div>
     </div>
@@ -452,4 +483,5 @@
     })();
   </script>
 </body>
+
 </html>

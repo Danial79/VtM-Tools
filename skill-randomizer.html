@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>VtM Random Skill Assigner</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -16,6 +21,7 @@
       align-items: center;
       min-height: 100vh;
     }
+
     .container {
       background: #1b1b1b;
       border-radius: 12px;
@@ -24,18 +30,21 @@
       width: 100%;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     }
+
     h1 {
       margin: 0 0 4px;
       font-size: 1.4rem;
       letter-spacing: 0.03em;
       text-align: center;
     }
+
     .subtitle {
       margin: 0 0 16px;
       font-size: 0.85rem;
       text-align: center;
       color: #aaa;
     }
+
     .controls {
       display: flex;
       justify-content: space-between;
@@ -44,6 +53,7 @@
       margin-bottom: 12px;
       font-size: 0.85rem;
     }
+
     .controls input[type="number"] {
       padding: 4px 6px;
       border-radius: 6px;
@@ -52,12 +62,14 @@
       color: #eee;
       width: 80px;
     }
+
     .controls label {
       display: flex;
       align-items: center;
       gap: 6px;
       color: #ccc;
     }
+
     #rollButton {
       width: 100%;
       margin-top: 6px;
@@ -72,24 +84,29 @@
       color: #fff;
       transition: transform 0.05s ease, box-shadow 0.05s ease, filter 0.1s ease;
     }
+
     #rollButton:hover {
       filter: brightness(1.05);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
+
     #rollButton:active {
       transform: translateY(1px);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
+
     .summary {
       margin-top: 10px;
       font-size: 0.85rem;
       color: #bbb;
     }
-.skills {
-  margin-top: 16px;
-  border-top: 1px solid #333;
-  padding-top: 14px;
-}
+
+    .skills {
+      margin-top: 16px;
+      border-top: 1px solid #333;
+      padding-top: 14px;
+    }
+
     .skill-row {
       display: flex;
       justify-content: space-between;
@@ -97,21 +114,53 @@
       padding: 3px 0;
       font-size: 0.9rem;
     }
+
     .skill-name {
       color: #eee;
     }
+
     .dots {
       font-family: "Menlo", "Consolas", monospace;
       color: #ffeb3b;
       letter-spacing: 1px;
     }
+
     .error {
       margin-top: 6px;
       font-size: 0.8rem;
       color: #ff8a80;
     }
+
+    @media (max-width: 600px) {
+      body {
+        align-items: flex-start;
+        /* top-align instead of vertical center */
+        padding: 12px;
+        /* breathing room from screen edges */
+      }
+
+      .container {
+        max-width: 100%;
+        /* use full screen width */
+        margin-top: 12px;
+        border-radius: 0.75rem;
+        /* optional: slightly softer corners */
+        box-shadow: none;
+        /* optional: less “heavy” on mobile */
+      }
+
+      h1 {
+        font-size: 1.2rem;
+        /* gently shrink big text */
+      }
+
+      .subtitle {
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>VtM Skill Randomizer</h1>
@@ -250,4 +299,5 @@
     })();
   </script>
 </body>
+
 </html>

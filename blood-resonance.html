@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Blood Resonance Generator</title>
     <style>
         * {
@@ -160,6 +161,29 @@
         .effect-list li {
             margin-bottom: 8px;
         }
+
+@media (max-width: 600px) {
+  body {
+    align-items: flex-start;   /* top-align instead of vertical center */
+    padding: 12px;             /* breathing room from screen edges */
+  }
+
+  .container {
+    max-width: 100%;           /* use full screen width */
+    margin-top: 12px;
+    border-radius: 0.75rem;    /* optional: slightly softer corners */
+    box-shadow: none;          /* optional: less “heavy” on mobile */
+  }
+
+  h1 {
+    font-size: 1.2rem;         /* gently shrink big text */
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+}
+
 
     </style>
 </head>
